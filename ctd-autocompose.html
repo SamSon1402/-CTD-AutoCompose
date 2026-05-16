@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTD-AutoCompose — 50% Faster Regulatory Submissions | Biolevate</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&family=Fraunces:opsz,wght@9..144,400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.4);
+            --secondary: #06b6d4;
+            --accent: #6366f1;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --bg-dark: #050816;
+            --bg-card: #0f172a;
+            --bg-elevated: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border: #1e293b;
+            --border-soft: #334155;
+            --ctd-gradient: linear-gradient(135deg, #3b82f6 0%, #06b6d4 50%, #6366f1 100%);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Sora', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            background-image:
+                radial-gradient(ellipse at 0% 0%, rgba(59, 130, 246, 0.10) 0%, transparent 50%),
+                radial-gradient(ellipse at 100% 100%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(6, 182, 212, 0.04) 0%, transparent 70%);
+        }
+
+        .header {
+            background: linear-gradient(180deg, rgba(59, 130, 246, 0.06) 0%, transparent 100%);
+            border-bottom: 1px solid var(--border-soft);
+            padding: 0.75rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+        }
+
+        .header-content {
+            max-width: 1800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            width: 46px;
+            height: 46px;
+            background: var(--ctd-gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            position: relative;
+        }
+
+        .logo-icon::after {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: var(--ctd-gradient);
+            border-radius: 14px;
+            z-index: -1;
+            opacity: 0.5;
+            filter: blur(8px);
+        }
+
+        .logo-text {
+            font-family: 'Fraunces', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: var(--ctd-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-subtitle {
+            font-size: 0.6rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-weight: 500;
+        }
+
+        .header-badges {
+            display: flex;
+            gap: 0.4rem;
+        }
+
+        .badge {
+            background: var(--bg-card);
+            border: 1px solid var(--border-soft);
+            padding: 0.35rem 0.7rem;
+            border-radius: 6px;
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            font-family: 'Fira Code', monospace;
+        }
+
+        .badge.live {
+            background: rgba(59, 130, 246, 0.15);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .badge.live::before {
+            content: '';
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: var(--primary);
+            border-radius: 50%;
+            margin-right: 5px;
+            animation: livePulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes livePulse {
+            0%, 100% { opacity: 1; box-shadow: 0 0 0 0 var(--primary-glow); }
+            50% { opacity: 0.6; box-shadow: 0 0 0 8px transparent; }
+        }
+
+        .main {
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 1.5rem 2rem;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero h1 {
+            font-family: 'Fraunces', serif;
+            font-size: 2.6rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            background: var(--ctd-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+        }
+
+        .hero p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .workspace {
+            display: grid;
+            grid-template-columns: 1fr 420px;
+            gap: 1.25rem;
+        }
+
+        @media (max-width: 1300px) {
+            .workspace { grid-template-columns: 1fr; }
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-soft);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border-soft);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.6) 0%, transparent 100%);
+        }
+
+        .card-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-body { padding: 1.25rem; }
+
+        /* CTD Document Workspace */
+        .ctd-workspace {
+            display: grid;
+            grid-template-columns: 220px 1fr;
+            gap: 1rem;
+            height: 460px;
+            background: var(--bg-dark);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-soft);
+        }
+
+        .ctd-tree {
+            border-right: 1px solid var(--border-soft);
+            padding-right: 1rem;
+            overflow-y: auto;
+        }
+
+        .ctd-module {
+            margin-bottom: 0.75rem;
+        }
+
+        .ctd-module-header {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--text-muted);
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+            padding-left: 0.25rem;
+        }
+
+        .ctd-section {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.15rem;
+            transition: all 0.3s;
+            font-family: 'Fira Code', monospace;
+            cursor: pointer;
+        }
+
+        .ctd-section:hover {
+            background: var(--bg-elevated);
+        }
+
+        .ctd-section.active {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--primary);
+            border-left: 2px solid var(--primary);
+        }
+
+        .ctd-section.done {
+            color: var(--success);
+        }
+
+        .ctd-section.drafting {
+            color: var(--warning);
+        }
+
+        .ctd-section-icon {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-soft);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.55rem;
+            flex-shrink: 0;
+        }
+
+        .ctd-section.done .ctd-section-icon {
+            background: var(--success);
+            border-color: var(--success);
+            color: white;
+        }
+
+        .ctd-section.drafting .ctd-section-icon {
+            background: var(--warning);
+            border-color: var(--warning);
+            color: white;
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .ctd-canvas {
+            position: relative;
+            overflow-y: auto;
+            padding: 0.5rem 0.75rem;
+        }
+
+        .ctd-canvas-section {
+            margin-bottom: 1.25rem;
+            opacity: 0;
+            animation: fadeInUp 0.4s forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+        }
+
+        .ctd-canvas-heading {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px dashed var(--border-soft);
+        }
+
+        .ctd-canvas-id {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.7rem;
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--primary);
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .ctd-canvas-title {
+            font-family: 'Fraunces', serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .ctd-canvas-body {
+            font-size: 0.78rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+        }
+
+        .ctd-citation {
+            background: rgba(99, 102, 241, 0.18);
+            color: #a5b4fc;
+            padding: 0.05rem 0.35rem;
+            border-radius: 3px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.65rem;
+            border-bottom: 1px dotted #6366f1;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .ctd-citation:hover {
+            background: rgba(99, 102, 241, 0.35);
+            color: white;
+        }
+
+        .ctd-highlight-add {
+            background: rgba(16, 185, 129, 0.15);
+            padding: 0 3px;
+            border-radius: 2px;
+            color: #6ee7b7;
+        }
+
+        /* Stats bar */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-soft);
+            border-radius: 10px;
+            padding: 0.75rem;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            font-family: 'Fira Code', monospace;
+        }
+
+        .stat-value.primary { color: var(--primary); }
+        .stat-value.success { color: var(--success); }
+        .stat-value.warning { color: var(--warning); }
+        .stat-value.secondary { color: var(--secondary); }
+
+        .stat-label {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 0.25rem;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .control-btn {
+            flex: 1;
+            padding: 0.75rem;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-soft);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-family: 'Sora', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .control-btn:hover {
+            border-color: var(--primary);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .control-btn.active {
+            border-color: var(--primary);
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--primary);
+        }
+
+        .control-btn.primary {
+            background: var(--ctd-gradient);
+            border-color: transparent;
+            color: white;
+        }
+
+        .control-btn.primary:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        /* Compliance Timeline */
+        .timeline-section {
+            background: var(--bg-elevated);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .timeline-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .timeline-time {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-family: 'Fira Code', monospace;
+        }
+
+        .timeline-track {
+            height: 28px;
+            background: var(--bg-dark);
+            border-radius: 6px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .timeline-bar {
+            position: absolute;
+            height: 100%;
+            left: 0;
+            background: var(--ctd-gradient);
+            border-radius: 6px;
+            transition: width 0.5s;
+        }
+
+        .timeline-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.4rem;
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            font-family: 'Fira Code', monospace;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .model-info {
+            background: var(--bg-elevated);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .model-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .model-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--ctd-gradient);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .model-name {
+            font-family: 'Fraunces', serif;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .model-version {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-family: 'Fira Code', monospace;
+        }
+
+        .model-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+
+        .model-stat {
+            background: var(--bg-dark);
+            border-radius: 8px;
+            padding: 0.75rem;
+            text-align: center;
+        }
+
+        .model-stat-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            font-family: 'Fira Code', monospace;
+            color: var(--primary);
+        }
+
+        .model-stat-label {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Source documents */
+        .source-list {
+            max-height: 230px;
+            overflow-y: auto;
+        }
+
+        .source-item {
+            display: flex;
+            gap: 0.75rem;
+            padding: 0.65rem 0.75rem;
+            background: var(--bg-elevated);
+            border-radius: 10px;
+            margin-bottom: 0.4rem;
+            border-left: 3px solid var(--border-soft);
+            transition: all 0.3s;
+        }
+
+        .source-item.active {
+            border-left-color: var(--secondary);
+            background: rgba(6, 182, 212, 0.08);
+        }
+
+        .source-item.cited {
+            border-left-color: var(--primary);
+            background: rgba(59, 130, 246, 0.08);
+        }
+
+        .source-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--bg-dark);
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+            flex-shrink: 0;
+        }
+
+        .source-content { flex: 1; min-width: 0; }
+
+        .source-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 0.1rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .source-meta {
+            font-size: 0.62rem;
+            color: var(--text-muted);
+            font-family: 'Fira Code', monospace;
+        }
+
+        .source-cited-count {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--primary);
+            font-family: 'Fira Code', monospace;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Detection Log */
+        .activity-log {
+            max-height: 260px;
+            overflow-y: auto;
+        }
+
+        .log-item {
+            display: flex;
+            gap: 0.75rem;
+            padding: 0.65rem 0.75rem;
+            background: var(--bg-elevated);
+            border-radius: 10px;
+            margin-bottom: 0.4rem;
+            border-left: 3px solid var(--primary);
+            animation: slideIn 0.3s ease;
+        }
+
+        .log-item.success { border-left-color: var(--success); }
+        .log-item.warning { border-left-color: var(--warning); }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .log-icon {
+            width: 30px;
+            height: 30px;
+            background: rgba(59, 130, 246, 0.18);
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .log-item.success .log-icon { background: rgba(16, 185, 129, 0.18); }
+        .log-item.warning .log-icon { background: rgba(245, 158, 11, 0.18); }
+
+        .log-content { flex: 1; min-width: 0; }
+
+        .log-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 0.1rem;
+        }
+
+        .log-meta {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            font-family: 'Fira Code', monospace;
+        }
+
+        /* Compliance Gauge */
+        .gauge-section {
+            background: var(--bg-elevated);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .gauge-wrapper {
+            position: relative;
+            height: 130px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gauge-svg { width: 180px; height: 100px; }
+
+        .gauge-bg { stroke: var(--bg-dark); fill: none; stroke-width: 12; }
+        .gauge-fill {
+            stroke: url(#gaugeGrad);
+            fill: none;
+            stroke-width: 12;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.6s ease;
+        }
+
+        .gauge-value {
+            position: absolute;
+            bottom: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.6rem;
+            font-weight: 700;
+            font-family: 'Fira Code', monospace;
+            color: var(--primary);
+        }
+
+        .gauge-label {
+            text-align: center;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 0.4rem;
+        }
+
+        /* Processing Overlay */
+        .processing-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(5, 8, 22, 0.97);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .processing-overlay.active { display: flex; }
+
+        .doc-stack-animation {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            margin-bottom: 2rem;
+        }
+
+        .doc-stack {
+            position: absolute;
+            width: 80px;
+            height: 100px;
+            background: var(--bg-elevated);
+            border: 2px solid var(--primary);
+            border-radius: 6px;
+            top: 50%;
+            left: 50%;
+            transform-origin: center;
+            box-shadow: 0 5px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .doc-stack::before, .doc-stack::after {
+            content: '';
+            position: absolute;
+            background: var(--primary);
+            opacity: 0.3;
+        }
+
+        .doc-stack::before {
+            top: 20%; left: 15%; right: 15%;
+            height: 2px;
+        }
+
+        .doc-stack::after {
+            top: 35%; left: 15%; right: 30%;
+            height: 2px;
+        }
+
+        .doc-stack:nth-child(1) { animation: docPulse 2s ease-in-out infinite; }
+        .doc-stack:nth-child(2) { animation: docPulse 2s ease-in-out infinite 0.5s; opacity: 0.7; }
+        .doc-stack:nth-child(3) { animation: docPulse 2s ease-in-out infinite 1s; opacity: 0.4; }
+
+        @keyframes docPulse {
+            0%, 100% { transform: translate(-50%, -50%) rotate(-15deg) translateY(0); }
+            50% { transform: translate(-50%, -50%) rotate(-15deg) translateY(-10px); }
+        }
+
+        .doc-stack:nth-child(2) { animation-name: docPulse2; }
+        .doc-stack:nth-child(3) { animation-name: docPulse3; }
+
+        @keyframes docPulse2 {
+            0%, 100% { transform: translate(-50%, -50%) rotate(0deg) translateY(0); }
+            50% { transform: translate(-50%, -50%) rotate(0deg) translateY(-10px); }
+        }
+
+        @keyframes docPulse3 {
+            0%, 100% { transform: translate(-50%, -50%) rotate(15deg) translateY(0); }
+            50% { transform: translate(-50%, -50%) rotate(15deg) translateY(-10px); }
+        }
+
+        .processing-text {
+            font-family: 'Fraunces', serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .processing-stage {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            font-family: 'Fira Code', monospace;
+        }
+
+        .processing-progress {
+            width: 300px;
+            height: 5px;
+            background: var(--bg-elevated);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .processing-bar {
+            height: 100%;
+            background: var(--ctd-gradient);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-soft);
+            border-radius: 12px;
+            padding: 0.85rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.6);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast-icon { font-size: 1.3rem; }
+        .toast-title { font-size: 0.85rem; font-weight: 600; }
+        .toast-message { font-size: 0.7rem; color: var(--text-muted); }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-dark); }
+        ::-webkit-scrollbar-thumb { background: var(--border-soft); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">📑</div>
+                <div>
+                    <div class="logo-text">CTD-AutoCompose</div>
+                    <div class="logo-subtitle">Biolevate · Regulatory Affairs</div>
+                </div>
+            </div>
+            <div class="header-badges">
+                <span class="badge live">● Ready</span>
+                <span class="badge">ICH eCTD v4.0</span>
+                <span class="badge">FDA · EMA · PMDA</span>
+                <span class="badge">50% Faster Submissions</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="hero">
+            <h1>Regulator-Ready CTD in Half the Time</h1>
+            <p>Ingest CSRs, study protocols, and statistical analyses → auto-populate ICH eCTD modules with traced citations</p>
+        </div>
+
+        <div class="workspace">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">📄 CTD Drafting Workspace</h3>
+                    <span style="font-size: 0.7rem; color: var(--text-muted); font-family: 'Fira Code';">Submission: NDA-2026-08471 · Compound: BVL-2188</span>
+                </div>
+                <div class="card-body">
+                    <div class="stats-bar">
+                        <div class="stat-card">
+                            <div class="stat-value primary" id="sectionsValue">0 / 38</div>
+                            <div class="stat-label">Sections Drafted</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value secondary" id="citationsValue">0</div>
+                            <div class="stat-label">Citations Traced</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value warning" id="timesavedValue">0h</div>
+                            <div class="stat-label">Time Saved</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value success" id="complianceValue">—</div>
+                            <div class="stat-label">Compliance %</div>
+                        </div>
+                    </div>
+
+                    <div class="ctd-workspace">
+                        <div class="ctd-tree" id="ctdTree"></div>
+                        <div class="ctd-canvas" id="ctdCanvas">
+                            <div style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 4rem 1rem;">
+                                Click "Start Drafting" to populate CTD sections from source documents.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="controls">
+                        <button class="control-btn primary" id="startBtn" onclick="toggleDrafting()">
+                            <span id="startIcon">▶</span>
+                            <span id="startText">Start Drafting</span>
+                        </button>
+                        <button class="control-btn" onclick="resetDrafting()">
+                            🔄 Reset
+                        </button>
+                        <button class="control-btn" onclick="exportDraft()">
+                            📤 Export eCTD
+                        </button>
+                        <button class="control-btn" onclick="validateCompliance()">
+                            ✓ Validate
+                        </button>
+                    </div>
+
+                    <div class="timeline-section">
+                        <div class="timeline-header">
+                            <span class="timeline-title">📈 Submission Progress</span>
+                            <span class="timeline-time" id="progressTime">0% complete</span>
+                        </div>
+                        <div class="timeline-track">
+                            <div class="timeline-bar" id="progressBar" style="width: 0%"></div>
+                        </div>
+                        <div class="timeline-labels">
+                            <span>M1 Regional</span>
+                            <span>M2 Summaries</span>
+                            <span>M3 Quality</span>
+                            <span>M4 Nonclinical</span>
+                            <span>M5 Clinical</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">🧠 Extraction Engine</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="model-info">
+                            <div class="model-header">
+                                <div class="model-icon">📑</div>
+                                <div>
+                                    <div class="model-name">CTD-AutoCompose</div>
+                                    <div class="model-version">v3.4.1 · NLP + GNN</div>
+                                </div>
+                            </div>
+                            <div class="model-stats">
+                                <div class="model-stat">
+                                    <div class="model-stat-value" id="inferenceTime">—</div>
+                                    <div class="model-stat-label">Section (s)</div>
+                                </div>
+                                <div class="model-stat">
+                                    <div class="model-stat-value">96.4%</div>
+                                    <div class="model-stat-label">Citation Accuracy</div>
+                                </div>
+                                <div class="model-stat">
+                                    <div class="model-stat-value">14k</div>
+                                    <div class="model-stat-label">ICH Rules</div>
+                                </div>
+                                <div class="model-stat">
+                                    <div class="model-stat-value">5</div>
+                                    <div class="model-stat-label">Modules Covered</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">📚 Source Documents</h3>
+                        <span style="font-size: 0.65rem; color: var(--text-muted);" id="sourceCount">6 documents</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="source-list" id="sourceList"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">📊 Regulatory Compliance</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="gauge-section">
+                            <div class="gauge-wrapper">
+                                <svg class="gauge-svg" viewBox="0 0 180 100">
+                                    <defs>
+                                        <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                            <stop offset="0%" stop-color="#3b82f6"/>
+                                            <stop offset="50%" stop-color="#06b6d4"/>
+                                            <stop offset="100%" stop-color="#10b981"/>
+                                        </linearGradient>
+                                    </defs>
+                                    <path class="gauge-bg" d="M 20 90 A 70 70 0 0 1 160 90"/>
+                                    <path class="gauge-fill" id="gaugeFill" d="M 20 90 A 70 70 0 0 1 160 90"
+                                          stroke-dasharray="220" stroke-dashoffset="220"/>
+                                </svg>
+                                <div class="gauge-value" id="gaugeValue">—</div>
+                            </div>
+                            <div class="gauge-label">ICH eCTD Compliance Score</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">📋 Activity Log</h3>
+                        <span style="font-size: 0.65rem; color: var(--text-muted);" id="logCount">0 events</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="activity-log" id="activityLog">
+                            <div style="color: var(--text-muted); font-size: 0.8rem; text-align: center; padding: 1.5rem;">
+                                Start drafting to see activity
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="processing-overlay" id="processingOverlay">
+        <div class="doc-stack-animation">
+            <div class="doc-stack"></div>
+            <div class="doc-stack"></div>
+            <div class="doc-stack"></div>
+        </div>
+        <div class="processing-text">Initializing CTD-AutoCompose</div>
+        <div class="processing-stage" id="processingStage">Loading ICH eCTD templates...</div>
+        <div class="processing-progress">
+            <div class="processing-bar" id="processingBar"></div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">
+        <span class="toast-icon">✅</span>
+        <div class="toast-content">
+            <div class="toast-title" id="toastTitle">Success</div>
+            <div class="toast-message" id="toastMessage">Drafting started</div>
+        </div>
+    </div>
+
+    <script>
+        const ctdModules = [
+            {
+                module: 'Module 2 — Common Technical Document Summaries',
+                sections: [
+                    { id: 'M2.2', title: 'Introduction' },
+                    { id: 'M2.3', title: 'Quality Overall Summary' },
+                    { id: 'M2.4', title: 'Nonclinical Overview' },
+                    { id: 'M2.5', title: 'Clinical Overview' },
+                    { id: 'M2.6.1', title: 'Pharmacology Written Summary' },
+                    { id: 'M2.6.2', title: 'Pharmacokinetics Written Summary' },
+                    { id: 'M2.7.1', title: 'Biopharmaceutic Studies' },
+                    { id: 'M2.7.2', title: 'Clinical Pharmacology Studies' },
+                    { id: 'M2.7.3', title: 'Clinical Efficacy' },
+                    { id: 'M2.7.4', title: 'Clinical Safety' }
+                ]
+            },
+            {
+                module: 'Module 3 — Quality',
+                sections: [
+                    { id: 'M3.2.S', title: 'Drug Substance' },
+                    { id: 'M3.2.P', title: 'Drug Product' },
+                    { id: 'M3.2.A', title: 'Appendices' },
+                    { id: 'M3.2.R', title: 'Regional Information' }
+                ]
+            },
+            {
+                module: 'Module 4 — Nonclinical Study Reports',
+                sections: [
+                    { id: 'M4.2.1', title: 'Pharmacology' },
+                    { id: 'M4.2.2', title: 'Pharmacokinetics' },
+                    { id: 'M4.2.3', title: 'Toxicology' }
+                ]
+            },
+            {
+                module: 'Module 5 — Clinical Study Reports',
+                sections: [
+                    { id: 'M5.2', title: 'Tabular Listing of Studies' },
+                    { id: 'M5.3.1', title: 'Biopharmaceutic Reports' },
+                    { id: 'M5.3.3', title: 'Human PK Studies' },
+                    { id: 'M5.3.5', title: 'Efficacy & Safety Studies' }
+                ]
+            }
+        ];
+
+        const sourceDocs = [
+            { icon: '📊', title: 'CSR-2026-BVL-2188-P3', meta: 'Phase III · 1,247 pages', type: 'csr' },
+            { icon: '📋', title: 'Protocol-BVL2188-v4.2', meta: 'Master protocol · v4.2', type: 'protocol' },
+            { icon: '📈', title: 'SAP-Statistical-Analysis', meta: 'SAP · final lock', type: 'sap' },
+            { icon: '🧪', title: 'Nonclinical-Tox-Bundle', meta: 'GLP toxicology · 14 studies', type: 'nonclinical' },
+            { icon: '⚗️', title: 'CMC-Quality-Dossier', meta: 'Drug substance + product', type: 'cmc' },
+            { icon: '📖', title: 'Investigator-Brochure-v8', meta: 'IB · current version', type: 'ib' }
+        ];
+
+        const sectionContent = {
+            'M2.5': {
+                title: 'Clinical Overview',
+                body: `BVL-2188 is a novel selective inhibitor under investigation for the treatment of moderate-to-severe atopic dermatitis in adult patients. The clinical development program comprised <span class="ctd-highlight-add">12 completed studies (n=2,847)</span>, including three pivotal Phase III trials. Pivotal efficacy was demonstrated in <span class="ctd-citation">CSR-2026-BVL-2188-P3 §11.4.1</span>, with statistically significant improvement vs. placebo on the primary EASI-75 endpoint at Week 16 (p&lt;0.0001). Safety profile was favorable, with adverse events consistent with the proposed mechanism as detailed in <span class="ctd-citation">Protocol-BVL2188-v4.2 §8.3</span>.`
+            },
+            'M2.7.3': {
+                title: 'Clinical Efficacy Summary',
+                body: `Across the pivotal Phase III program, BVL-2188 met all primary and key secondary endpoints. The EASI-75 response rate was <span class="ctd-highlight-add">68.4% at Week 16 vs 12.1% for placebo</span> (Δ=56.3 pp; 95% CI: 48.7-63.9), per the pre-specified analysis in <span class="ctd-citation">SAP-Statistical-Analysis §6.2</span>. Sustained response through Week 52 was observed in <span class="ctd-citation">CSR-2026-BVL-2188-P3 §11.4.6</span>. Patient-reported outcomes (DLQI, NRS-Itch) supported the clinical benefit.`
+            },
+            'M2.7.4': {
+                title: 'Clinical Safety Summary',
+                body: `The safety database includes <span class="ctd-highlight-add">2,847 unique subjects exposed</span> to BVL-2188 across all doses. Most common adverse events (≥5%) were nasopharyngitis (8.2%), headache (6.4%), and injection-site reaction (5.9%), all primarily mild-to-moderate in severity per <span class="ctd-citation">CSR-2026-BVL-2188-P3 §12.2.3</span>. No clinically meaningful imbalance in serious adverse events was observed. Hepatic safety monitoring per <span class="ctd-citation">Protocol-BVL2188-v4.2 §9.4</span> revealed no signal of drug-induced liver injury.`
+            },
+            'M3.2.S': {
+                title: 'Drug Substance — General Information',
+                body: `BVL-2188 (chemical name: redacted per CMC confidentiality) is a small-molecule selective inhibitor with molecular formula C₂₂H₂₄N₆O₃. Manufacturing is conducted at <span class="ctd-highlight-add">two GMP-licensed facilities</span> per <span class="ctd-citation">CMC-Quality-Dossier §3.2.S.2</span>. Characterization includes X-ray diffraction, NMR (¹H, ¹³C), HRMS, and elemental analysis. Polymorph control strategy is validated across the manufacturing range as detailed in <span class="ctd-citation">CMC-Quality-Dossier §3.2.S.3.2</span>.`
+            },
+            'M4.2.3': {
+                title: 'Nonclinical Toxicology',
+                body: `Pivotal toxicology program included <span class="ctd-highlight-add">26-week rat and 39-week dog studies</span> at exposures up to 25× the proposed clinical dose. No adverse findings related to drug administration were observed below the NOAEL, as detailed in <span class="ctd-citation">Nonclinical-Tox-Bundle Study TOX-014</span>. Genotoxicity battery (Ames, in vitro micronucleus, in vivo micronucleus) was negative per <span class="ctd-citation">Nonclinical-Tox-Bundle Study GEN-003</span>.`
+            },
+            'M5.3.5': {
+                title: 'Efficacy & Safety Studies',
+                body: `Three pivotal Phase III studies (BVL-301, BVL-302, BVL-303) form the basis of the efficacy and safety claim. All three studies were conducted under harmonized protocols per <span class="ctd-citation">Protocol-BVL2188-v4.2</span>, with consistent results across geographies and patient subgroups. Pooled analysis is presented in <span class="ctd-citation">CSR-2026-BVL-2188-P3 §11.5</span> and demonstrates <span class="ctd-highlight-add">robust treatment effect (p&lt;0.0001 in all sensitivity analyses)</span>.`
+            }
+        };
+
+        let isDrafting = false;
+        let draftingInterval = null;
+        let sectionsDrafted = 0;
+        let totalSections = 0;
+        let citationsTraced = 0;
+        let elapsedMinutes = 0;
+        let logEntries = [];
+        let activeSectionIds = [];
+        let sourceCiteCounts = {};
+
+        function init() {
+            renderCTDTree();
+            renderSourceList();
+            ctdModules.forEach(m => totalSections += m.sections.length);
+            document.getElementById('sectionsValue').textContent = `0 / ${totalSections}`;
+        }
+
+        function renderCTDTree() {
+            const tree = document.getElementById('ctdTree');
+            tree.innerHTML = ctdModules.map(m => `
+                <div class="ctd-module">
+                    <div class="ctd-module-header">${m.module.split('—')[0].trim()}</div>
+                    ${m.sections.map(s => `
+                        <div class="ctd-section" id="sec-${s.id.replace(/\./g, '-')}">
+                            <div class="ctd-section-icon">·</div>
+                            <span>${s.id}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `).join('');
+        }
+
+        function renderSourceList() {
+            const list = document.getElementById('sourceList');
+            list.innerHTML = sourceDocs.map(d => `
+                <div class="source-item" id="src-${d.type}">
+                    <div class="source-icon">${d.icon}</div>
+                    <div class="source-content">
+                        <div class="source-title">${d.title}</div>
+                        <div class="source-meta">${d.meta}</div>
+                    </div>
+                    <div class="source-cited-count" id="cite-${d.type}">·</div>
+                </div>
+            `).join('');
+            document.getElementById('sourceCount').textContent = `${sourceDocs.length} documents`;
+        }
+
+        function toggleDrafting() {
+            if (!isDrafting) startDrafting();
+            else stopDrafting();
+        }
+
+        function startDrafting() {
+            const overlay = document.getElementById('processingOverlay');
+            const bar = document.getElementById('processingBar');
+            const stage = document.getElementById('processingStage');
+            overlay.classList.add('active');
+
+            const stages = [
+                'Loading ICH eCTD templates...',
+                'Parsing source documents (NLP)...',
+                'Building citation graph (GNN)...',
+                'Mapping content to CTD modules...',
+                'Validating against ICH rules...',
+                'Generating regulator-ready draft...'
+            ];
+
+            let progress = 0;
+            let stageIndex = 0;
+
+            const interval = setInterval(() => {
+                progress += Math.random() * 16 + 8;
+                if (progress > 100) progress = 100;
+                bar.style.width = progress + '%';
+
+                const newStage = Math.floor((progress / 100) * stages.length);
+                if (newStage !== stageIndex && newStage < stages.length) {
+                    stageIndex = newStage;
+                    stage.textContent = stages[stageIndex];
+                }
+
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        overlay.classList.remove('active');
+                        beginRealTimeDrafting();
+                    }, 300);
+                }
+            }, 90);
+        }
+
+        function beginRealTimeDrafting() {
+            isDrafting = true;
+            document.getElementById('startIcon').textContent = '⏸';
+            document.getElementById('startText').textContent = 'Pause Drafting';
+            document.getElementById('startBtn').classList.add('active');
+
+            document.getElementById('ctdCanvas').innerHTML = '';
+
+            const allSections = [];
+            ctdModules.forEach(m => m.sections.forEach(s => allSections.push(s)));
+
+            draftingInterval = setInterval(() => {
+                if (sectionsDrafted >= allSections.length) {
+                    stopDrafting();
+                    showToast('🎉 Submission Complete', 'CTD draft ready for regulatory review');
+                    return;
+                }
+
+                const section = allSections[sectionsDrafted];
+                draftSection(section);
+                sectionsDrafted++;
+                elapsedMinutes += Math.floor(8 + Math.random() * 6);
+
+                updateStats();
+                document.getElementById('inferenceTime').textContent = (1.2 + Math.random() * 1.4).toFixed(1);
+            }, 1300);
+        }
+
+        function draftSection(section) {
+            // Mark drafting
+            const treeItem = document.getElementById(`sec-${section.id.replace(/\./g, '-')}`);
+            if (treeItem) {
+                treeItem.classList.add('drafting');
+                treeItem.querySelector('.ctd-section-icon').textContent = '✎';
+            }
+
+            // Add canvas section
+            const canvas = document.getElementById('ctdCanvas');
+            const content = sectionContent[section.id] || {
+                title: section.title,
+                body: `Section ${section.id} (${section.title}) populated from source documents. Auto-generated content with full traceability to <span class="ctd-citation">CSR-2026-BVL-2188-P3</span> and <span class="ctd-citation">Protocol-BVL2188-v4.2</span>.`
+            };
+
+            const div = document.createElement('div');
+            div.className = 'ctd-canvas-section';
+            div.innerHTML = `
+                <div class="ctd-canvas-heading">
+                    <span class="ctd-canvas-id">${section.id}</span>
+                    <span class="ctd-canvas-title">${content.title}</span>
+                </div>
+                <div class="ctd-canvas-body">${content.body}</div>
+            `;
+            canvas.appendChild(div);
+            canvas.scrollTop = canvas.scrollHeight;
+
+            // Mark done after a moment
+            setTimeout(() => {
+                if (treeItem) {
+                    treeItem.classList.remove('drafting');
+                    treeItem.classList.add('done');
+                    treeItem.querySelector('.ctd-section-icon').textContent = '✓';
+                }
+            }, 800);
+
+            // Random citations
+            const citeCount = Math.floor(Math.random() * 4) + 2;
+            citationsTraced += citeCount;
+            const randomSource = sourceDocs[Math.floor(Math.random() * sourceDocs.length)];
+            sourceCiteCounts[randomSource.type] = (sourceCiteCounts[randomSource.type] || 0) + citeCount;
+            const srcEl = document.getElementById(`src-${randomSource.type}`);
+            const citeEl = document.getElementById(`cite-${randomSource.type}`);
+            srcEl.classList.add('cited');
+            citeEl.textContent = `×${sourceCiteCounts[randomSource.type]}`;
+
+            // Log entry
+            addLogEntry(section, citeCount);
+
+            // Update compliance gauge
+            updateComplianceGauge();
+        }
+
+        function addLogEntry(section, citeCount) {
+            const log = document.getElementById('activityLog');
+            const time = `${String(Math.floor(elapsedMinutes / 60)).padStart(2,'0')}:${String(elapsedMinutes % 60).padStart(2,'0')}`;
+
+            const entry = document.createElement('div');
+            entry.className = 'log-item success';
+            entry.innerHTML = `
+                <div class="log-icon">📝</div>
+                <div class="log-content">
+                    <div class="log-title">${section.id} drafted</div>
+                    <div class="log-meta">${time} · ${citeCount} citations traced</div>
+                </div>
+            `;
+
+            if (log.firstChild && log.firstChild.style && log.firstChild.style.textAlign) {
+                log.innerHTML = '';
+            }
+            log.insertBefore(entry, log.firstChild);
+            logEntries.unshift(entry);
+            if (logEntries.length > 30) {
+                logEntries.pop().remove();
+            }
+            document.getElementById('logCount').textContent = `${logEntries.length} events`;
+        }
+
+        function updateStats() {
+            document.getElementById('sectionsValue').textContent = `${sectionsDrafted} / ${totalSections}`;
+            document.getElementById('citationsValue').textContent = citationsTraced;
+            document.getElementById('timesavedValue').textContent = Math.floor(sectionsDrafted * 3.2) + 'h';
+
+            const progress = (sectionsDrafted / totalSections) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('progressTime').textContent = Math.floor(progress) + '% complete';
+        }
+
+        function updateComplianceGauge() {
+            const base = 87;
+            const compliance = Math.min(99.4, base + (sectionsDrafted / totalSections) * 12);
+            document.getElementById('complianceValue').textContent = compliance.toFixed(1) + '%';
+            document.getElementById('gaugeValue').textContent = compliance.toFixed(0) + '%';
+
+            // 220 = approx arc length
+            const offset = 220 - (220 * compliance / 100);
+            document.getElementById('gaugeFill').setAttribute('stroke-dashoffset', offset);
+        }
+
+        function stopDrafting() {
+            isDrafting = false;
+            document.getElementById('startIcon').textContent = '▶';
+            document.getElementById('startText').textContent = 'Resume Drafting';
+            document.getElementById('startBtn').classList.remove('active');
+            if (draftingInterval) clearInterval(draftingInterval);
+        }
+
+        function resetDrafting() {
+            stopDrafting();
+            sectionsDrafted = 0;
+            citationsTraced = 0;
+            elapsedMinutes = 0;
+            logEntries = [];
+            sourceCiteCounts = {};
+
+            document.getElementById('sectionsValue').textContent = `0 / ${totalSections}`;
+            document.getElementById('citationsValue').textContent = '0';
+            document.getElementById('timesavedValue').textContent = '0h';
+            document.getElementById('complianceValue').textContent = '—';
+            document.getElementById('gaugeValue').textContent = '—';
+            document.getElementById('gaugeFill').setAttribute('stroke-dashoffset', 220);
+            document.getElementById('progressBar').style.width = '0%';
+            document.getElementById('progressTime').textContent = '0% complete';
+            document.getElementById('inferenceTime').textContent = '—';
+
+            document.getElementById('ctdCanvas').innerHTML = `
+                <div style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 4rem 1rem;">
+                    Click "Start Drafting" to populate CTD sections from source documents.
+                </div>
+            `;
+            document.getElementById('activityLog').innerHTML = `
+                <div style="color: var(--text-muted); font-size: 0.8rem; text-align: center; padding: 1.5rem;">
+                    Start drafting to see activity
+                </div>
+            `;
+            document.getElementById('logCount').textContent = '0 events';
+
+            renderCTDTree();
+            renderSourceList();
+            showToast('🔄 Reset Complete', 'Workspace cleared');
+        }
+
+        function exportDraft() {
+            showToast('📤 eCTD Export Started', `${sectionsDrafted} sections packaged · M1-M5 zip`);
+        }
+
+        function validateCompliance() {
+            showToast('✓ Validation Passed', 'No ICH eCTD format violations detected');
+        }
+
+        function showToast(title, message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastTitle').textContent = title;
+            document.getElementById('toastMessage').textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        init();
+    </script>
+</body>
+</html>
